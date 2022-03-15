@@ -1,12 +1,22 @@
-import React, { useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import './style.css'
+
+const localData = () => {
+    const list = localStorage.getItem("myList");
+    if (list) {
+        return JSON.parse(list);
+    } else {
+        return [];
+    }
+}
 
 function Todo() {
     const [inputData, setInputData] = useState("");
-    const [items, setItems] = useState([]);
+    const [items, setItems] = useState(localData());
     const onChange = (e) => {
         setInputData(e.target.value)
     }
+    //adding Items
     const addItem = () => {
         if (!inputData) {
             alert('pleasse fill the data');
@@ -19,15 +29,23 @@ function Todo() {
             setInputData("")
         }
     }
+    // Deleting items
     const deleteItem = (index) => {
         const updatedItems = items.filter((item) => {
             return item.id !== index;
         });
         setItems(updatedItems);
     }
+    // Deleting all items
     const removeAll = () => {
         setItems([]);
     }
+
+    //local Storage
+    useEffect(() => {
+        localStorage.setItem("myList", JSON.stringify(items))
+    }, [items])
+
     return (
         <>
             <div className="main-div">
