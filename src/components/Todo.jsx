@@ -13,6 +13,8 @@ const localData = () => {
 function Todo() {
     const [inputData, setInputData] = useState("");
     const [items, setItems] = useState(localData());
+    const [editItem, setEditItem] = useState("");
+    const [toggleBtn, setToggleBtn] = useState(false);
     const onChange = (e) => {
         setInputData(e.target.value)
     }
@@ -20,7 +22,20 @@ function Todo() {
     const addItem = () => {
         if (!inputData) {
             alert('pleasse fill the data');
-        } else {
+        } else if (inputData && toggleBtn) {
+            setItems(
+                items.map((item) => {
+                    if (item.id === editItem) {
+                        return { ...item, name: inputData }
+                    }
+                    return item;
+                })
+            )
+            setInputData("")
+            setToggleBtn(false);
+            setEditItem(null);
+        }
+        else {
             const myNewInputData = {
                 id: new Date().getTime().toString(),
                 name: inputData
@@ -28,6 +43,16 @@ function Todo() {
             setItems([...items, myNewInputData])
             setInputData("")
         }
+    }
+    // Updating items
+    const updateItem = (index) => {
+        const item_edited = items.find((item) => {
+            return item.id === index;
+        })
+        setInputData(item_edited.name)
+        setToggleBtn(true);
+        setEditItem(index);
+
     }
     // Deleting items
     const deleteItem = (index) => {
@@ -61,7 +86,10 @@ function Todo() {
                             className='form-conyrol'
                             value={inputData}
                             onChange={onChange} />
-                        <i className="fa fa-plus add-btn" onClick={addItem}></i>
+                        {toggleBtn
+                            ? <i className="far fa-edit" onClick={addItem}></i>
+                            : <i className="fa fa-plus add-btn" onClick={addItem}></i>}
+
                     </div>
                     <div className="showItems">
                         {items.map((item) => {
@@ -69,7 +97,7 @@ function Todo() {
                                 <div className="eachItem" key={item.id}>
                                     <h3>{item.name}</h3>
                                     <div className="todo-btn">
-                                        <i className="far fa-edit"></i>
+                                        <i className="far fa-edit" onClick={() => updateItem(item.id)}></i>
                                         <i className="far fa-trash-alt" onClick={() => deleteItem(item.id)}></i>
                                     </div>
                                 </div>
